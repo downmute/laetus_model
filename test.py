@@ -5,6 +5,7 @@ from bitsandbytes import functional
 import torch
 from accelerate import Accelerator
 import coremltools as ct 
+from torch.utils.mobile_optimizer import optimize_for_mobile
 
 
 tokenizer_checkpoint = "microsoft/phi-1_5"
@@ -29,7 +30,21 @@ tokenizer.pad_token = "[PAD]"
 tokenizer.padding_side = "left"
 model = AutoModelForCausalLM.from_pretrained(tokenizer_checkpoint, torch_dtype="auto", load_in_4bit=True, flash_attn=True, flash_rotary=True, fused_dense=True, device_map="auto", trust_remote_code=True, quantization_config=double_quant_config)
 
-torch.save(model.state_dict(), "./models/phi-1_5.pt")
+#torch.save(model.state_dict(), "./models/phi-1_5.pt")
+
+print(list(model.state_dict().items())[0][1].size())
+
+text = "Be the change you want to see in the world."
+tokenized_text = tokenizer.tokenize(text)
+indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
+dummy_input = torch.tensor([indexed_tokens])
+
+exported_model = torch.export.export(model(dummy_input),(51200, 2048))
+torch.export.save(exported_model, "./models/phi-1_5-4bit-optimized.pt2")
+
+# torchscript_model = torch.jit.trace(model, example_inputs=dummy_input)
+# torchscript_model_optimized = optimize_for_mobile(torchscript_model)
+# torch.jit.save(torchscript_model_optimized, "phi-1_5-4bit-optimized.pt")
 
 #os.chdir("D:/models/")
 
