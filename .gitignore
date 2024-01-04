@@ -1,3 +1,4 @@
 data.csv
 models/phi-1_5.pt
 main.ipynb
+__pycache__/model.cpython-311.pyc
