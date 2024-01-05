@@ -24,20 +24,22 @@ class ChatModel(nn.Module):
                                                 mask_check=False
                                                 )
             self.fc = nn.Sequential(
-                nn.Flatten(start_dim=0),
+                nn.Flatten(start_dim=1),
                 nn.Linear(self.max_length*self.embedding_dim, 128),
                 nn.ReLU(),
                 nn.Linear(128, 32),
                 nn.ReLU(),
-                nn.Linear(32, 5),    
-                nn.Softmax()      
+                nn.Linear(32, 6),     
             )
             
-        def forward(self, x):
-            x = self.embedding(x)
+        def forward(self, input_ids, labels, attention_mask=None):
+            x = self.embedding(input_ids)
             x = self.encoder(x)
-            x = self.fc(x)
-            return x
+            logits = self.fc(x)
+            loss = torch.nn.CrossEntropyLoss()
+            loss = loss(logits, labels)
+            return {"loss": loss, "logits": logits}
+          
         
 def main():
 
