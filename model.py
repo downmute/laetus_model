@@ -5,7 +5,7 @@ from transformers import BertTokenizer
 class ChatModel(nn.Module):
         def __init__(self, input_size=128, transformer_d=128, embedding_size=30522, embedding_dim=128, max_length=24):
             super(ChatModel, self).__init__()
-
+            
             self.max_length = max_length
             self.input_size = input_size
             self.embedding_size = embedding_size
@@ -32,13 +32,15 @@ class ChatModel(nn.Module):
                 nn.Linear(32, 6),     
             )
             
-        def forward(self, input_ids, labels, attention_mask=None):
+        def forward(self, input_ids, labels=None, attention_mask=None):
             x = self.embedding(input_ids)
             x = self.encoder(x)
             logits = self.fc(x)
-            loss = torch.nn.CrossEntropyLoss()
-            loss = loss(logits, labels)
-            return {"loss": loss, "logits": logits}
+            # loss = torch.nn.CrossEntropyLoss()
+            # if labels != None:
+            #     loss = loss(logits, labels)
+            #     return {"loss": loss, "logits": logits}
+            return logits
           
         
 def main():

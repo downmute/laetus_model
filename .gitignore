@@ -20,3 +20,4 @@ models/checkpoint-2000/tokenizer_config.json
 models/checkpoint-2000/trainer_state.json
 models/checkpoint-2000/training_args.bin
 models/checkpoint-2000/vocab.txt
+models/model.safetensors
